@@ -262,6 +262,7 @@ class _GamePageState extends State<GamePage> {
     // 4 options → 2 cols but wider cells (ratio 1.5) so row height matches 3-col layout
     final gridCrossAxisCount = optionCount == 4 ? 2 : 3;
     final gridChildAspectRatio = optionCount == 4 ? 1.5 : 1.0;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       floatingActionButton: isTypingMode && !_isAnswered && !_isGameCompleted
@@ -336,34 +337,39 @@ class _GamePageState extends State<GamePage> {
                   ],
                 ),
               ),
-              // Sound card — smaller flex in typing mode to give more room to input
-              Expanded(
-                flex: isTypingMode ? 1 : 2,
-                child: Container(
-                  color: Colors.blue.shade50,
-                  padding: EdgeInsets.all(isTypingMode ? 8 : 20),
-                  child: Center(
-                    child: _isGameCompleted
-                        ? IgnorePointer(
-                            child: Opacity(
-                              opacity: 0.5,
-                              child: SoundCard(
-                                audioPath: soundFile,
-                                audioService: _audioService,
-                                imageAsset: null,
-                                tapLabel: s('tapToHear'),
+              // Sound card — hidden in typing mode when keyboard is open.
+              // if/else keeps TypeArea always at Column index 2 so its
+              // FocusNode state survives the layout change.
+              if (!isTypingMode || !keyboardOpen)
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    color: Colors.blue.shade50,
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: _isGameCompleted
+                          ? IgnorePointer(
+                              child: Opacity(
+                                opacity: 0.5,
+                                child: SoundCard(
+                                  audioPath: soundFile,
+                                  audioService: _audioService,
+                                  imageAsset: null,
+                                  tapLabel: s('tapToHear'),
+                                ),
                               ),
+                            )
+                          : SoundCard(
+                              audioPath: soundFile,
+                              audioService: _audioService,
+                              imageAsset: null,
+                              tapLabel: s('tapToHear'),
                             ),
-                          )
-                        : SoundCard(
-                            audioPath: soundFile,
-                            audioService: _audioService,
-                            imageAsset: null,
-                            tapLabel: s('tapToHear'),
-                          ),
+                    ),
                   ),
-                ),
-              ),
+                )
+              else
+                const SizedBox.shrink(),
               // Bottom: typing field or option buttons
               Expanded(
                 flex: 2,
