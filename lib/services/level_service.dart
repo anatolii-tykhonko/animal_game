@@ -44,7 +44,7 @@ class LevelService {
   final Random _random = Random();
 
   // Returns how many answer options to show for a given difficulty.
-  // difficulty 1 → 3, difficulty 2 → 4, difficulty 3+ → 6 (all animals).
+  // difficulty 1 → 3, difficulty 2 → 4, difficulty 3+ → 6 (all animals)
   int optionCountForDifficulty(int difficulty) {
     if (difficulty <= 1) return 3;
     if (difficulty == 2) return 4;
