@@ -47,6 +47,10 @@ dependencies:
   # Local storage for saving game state
   shared_preferences: ^2.2.2
 
+  # Video reward feature
+  youtube_player_iframe: ^4.0.0
+  connectivity_plus: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
