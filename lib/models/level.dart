@@ -3,6 +3,7 @@ import 'animal.dart';
 enum LevelMode {
   picture,
   text,
+  typing,
 }
 
 class Level {

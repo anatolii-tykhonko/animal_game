@@ -1,32 +1,33 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/level.dart';
 
-/// Service for saving and loading game state
 class GameStateService {
-  static const String _keyScore = 'game_score';
-  static const String _keyDragonSteps = 'game_dragon_steps';
-  static const String _keyLevelNumber = 'game_level_number';
+  static String _keyScore(LevelMode mode) => 'game_score_${mode.name}';
+  static String _keySteps(LevelMode mode) => 'game_steps_${mode.name}';
+  static String _keyLevel(LevelMode mode) => 'game_level_${mode.name}';
+  static String _keyDifficulty(LevelMode mode) => 'game_difficulty_${mode.name}';
 
-  /// Save game state
-  Future<void> saveGameState({
+  Future<void> saveGameState(
+    LevelMode mode, {
     required int score,
     required int dragonSteps,
     required int levelNumber,
+    required int difficultyLevel,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyScore, score);
-    await prefs.setInt(_keyDragonSteps, dragonSteps);
-    await prefs.setInt(_keyLevelNumber, levelNumber);
+    await prefs.setInt(_keyScore(mode), score);
+    await prefs.setInt(_keySteps(mode), dragonSteps);
+    await prefs.setInt(_keyLevel(mode), levelNumber);
+    await prefs.setInt(_keyDifficulty(mode), difficultyLevel);
   }
 
-  /// Load game state
-  Future<GameState?> loadGameState() async {
+  Future<GameState?> loadGameState(LevelMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    
-    final score = prefs.getInt(_keyScore);
-    final dragonSteps = prefs.getInt(_keyDragonSteps);
-    final levelNumber = prefs.getInt(_keyLevelNumber);
 
-    // If no saved state exists, return null
+    final score = prefs.getInt(_keyScore(mode));
+    final dragonSteps = prefs.getInt(_keySteps(mode));
+    final levelNumber = prefs.getInt(_keyLevel(mode));
+
     if (score == null || dragonSteps == null || levelNumber == null) {
       return null;
     }
@@ -35,27 +36,29 @@ class GameStateService {
       score: score,
       dragonSteps: dragonSteps,
       levelNumber: levelNumber,
+      difficultyLevel: prefs.getInt(_keyDifficulty(mode)) ?? 1,
     );
   }
 
-  /// Clear saved game state
-  Future<void> clearGameState() async {
+  Future<void> clearGameState(LevelMode mode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_keyScore);
-    await prefs.remove(_keyDragonSteps);
-    await prefs.remove(_keyLevelNumber);
+    await prefs.remove(_keyScore(mode));
+    await prefs.remove(_keySteps(mode));
+    await prefs.remove(_keyLevel(mode));
+    await prefs.remove(_keyDifficulty(mode));
   }
 }
 
-/// Model for game state
 class GameState {
   final int score;
   final int dragonSteps;
   final int levelNumber;
+  final int difficultyLevel;
 
   GameState({
     required this.score,
     required this.dragonSteps,
     required this.levelNumber,
+    required this.difficultyLevel,
   });
 }

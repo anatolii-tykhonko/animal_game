@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
 
-/// Widget showing dragon progress animation (0-10 steps)
 class DragonProgress extends StatelessWidget {
-  final int dragonSteps; // 0 to 10
+  final int dragonSteps;
+  final String stepsLabel;
 
   const DragonProgress({
     super.key,
     required this.dragonSteps,
+    required this.stepsLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Clamp dragon steps between 0 and 10
     final steps = dragonSteps.clamp(0, 10);
-    final progress = steps / 10.0; // 0.0 to 1.0
+    final progress = steps / 10.0;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       color: Colors.white,
       child: Column(
         children: [
-          // Progress bar with dragon
           LayoutBuilder(
             builder: (context, constraints) {
               final trackWidth = constraints.maxWidth;
-              final dragonSize = 30.0;
+              const dragonSize = 30.0;
               final dragonPosition = (trackWidth - dragonSize) * progress;
 
               return Stack(
                 children: [
-                  // Background track
                   Container(
                     height: 30,
                     decoration: BoxDecoration(
@@ -38,7 +36,6 @@ class DragonProgress extends StatelessWidget {
                       border: Border.all(color: Colors.grey[400]!),
                     ),
                   ),
-                  // Progress fill
                   FractionallySizedBox(
                     widthFactor: progress,
                     child: Container(
@@ -49,7 +46,6 @@ class DragonProgress extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Dragon icon (moves along the track with animation)
                   AnimatedPositioned(
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeInOut,
@@ -64,20 +60,15 @@ class DragonProgress extends StatelessWidget {
                         border: Border.all(color: Colors.orange[800]!, width: 2),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.5),
+                            color: Colors.orange.withValues(alpha: 0.5),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.pets,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      child: const Icon(Icons.pets, color: Colors.white, size: 20),
                     ),
                   ),
-                  // Finish line flag at the end
                   Positioned(
                     right: 0,
                     top: 0,
@@ -91,11 +82,7 @@ class DragonProgress extends StatelessWidget {
                           bottomRight: Radius.circular(15),
                         ),
                       ),
-                      child: const Icon(
-                        Icons.flag,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      child: const Icon(Icons.flag, color: Colors.white, size: 20),
                     ),
                   ),
                 ],
@@ -103,9 +90,8 @@ class DragonProgress extends StatelessWidget {
             },
           ),
           const SizedBox(height: 8),
-          // Steps counter
           Text(
-            'Steps: $steps/10',
+            '$stepsLabel: ${dragonSteps.clamp(0, 10)}/10',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,

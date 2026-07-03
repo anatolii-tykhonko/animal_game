@@ -1,30 +1,62 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+import 'package:animal_game/services/language_service.dart';
+import 'package:animal_game/ui/home/home_page.dart';
 
-import 'package:animal_game/main.dart';
+Widget wrapWithProvider(Widget child) => ChangeNotifierProvider(
+      create: (_) => LanguageService(),
+      child: MaterialApp(home: child),
+    );
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('HomePage', () {
+    testWidgets('shows Animal Sounds Game title in English', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(const HomePage()));
+      expect(find.text('Animal Sounds Game'), findsOneWidget);
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    testWidgets('shows Start button in English', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(const HomePage()));
+      expect(find.text('Start'), findsOneWidget);
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    testWidgets('shows EN and UA language buttons', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(const HomePage()));
+      expect(find.text('EN'), findsOneWidget);
+      expect(find.text('UA'), findsOneWidget);
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    testWidgets('tapping UA switches title to Ukrainian', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(const HomePage()));
+      await tester.tap(find.text('UA'));
+      await tester.pump();
+      expect(find.text('Гра Звуки Тварин'), findsOneWidget);
+      expect(find.text('Почати'), findsOneWidget);
+    });
+
+    testWidgets('tapping EN after UA switches back to English', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(const HomePage()));
+      await tester.tap(find.text('UA'));
+      await tester.pump();
+      await tester.tap(find.text('EN'));
+      await tester.pump();
+      expect(find.text('Animal Sounds Game'), findsOneWidget);
+    });
+
+    testWidgets('Start button tap target is at least 64x64', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(const HomePage()));
+      final buttons = find.byType(ElevatedButton);
+      // Find the Start button (the widest one)
+      final startButton = tester.widgetList<ElevatedButton>(buttons).reduce(
+        (a, b) => tester.getSize(find.byWidget(a)).width >
+                tester.getSize(find.byWidget(b)).width
+            ? a
+            : b,
+      );
+      final size = tester.getSize(find.byWidget(startButton));
+      expect(size.width, greaterThanOrEqualTo(64));
+      expect(size.height, greaterThanOrEqualTo(64));
+    });
   });
 }

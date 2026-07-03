@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Overlay widget for displaying lose animation
 class LoseOverlay extends StatelessWidget {
-  const LoseOverlay({super.key});
+  final String message;
+
+  const LoseOverlay({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +27,9 @@ class LoseOverlay extends StatelessWidget {
               },
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Try Again!',
-              style: TextStyle(
+            Text(
+              message,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,

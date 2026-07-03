@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../models/animal.dart';
+import '../../../l10n/app_strings.dart';
 
-/// Widget for displaying animal option buttons (picture or text)
 class AnimalOptionButton extends StatelessWidget {
   final Animal animal;
   final bool isPictureMode;
+  final AppLanguage language;
   final VoidCallback? onTap;
 
   const AnimalOptionButton({
     super.key,
     required this.animal,
     required this.isPictureMode,
+    required this.language,
     this.onTap,
   });
 
@@ -28,13 +30,11 @@ class AnimalOptionButton extends StatelessWidget {
               height: 50,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                debugPrint('Error loading image: ${animal.imageAsset}');
-                debugPrint('Error: $error');
                 return const Icon(Icons.image, size: 50);
               },
             )
           : Text(
-              animal.name,
+              AppStrings.of(language, animal.id),
               style: const TextStyle(fontSize: 24),
             ),
     );

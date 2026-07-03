@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
-/// Overlay widget for displaying game completion (10/10 steps reached)
 class CompletionOverlay extends StatelessWidget {
   final VoidCallback onRestart;
   final VoidCallback onClose;
+  final String title;
+  final String subtitle;
+  final String playAgainLabel;
+  final String closeLabel;
 
   const CompletionOverlay({
     super.key,
     required this.onRestart,
     required this.onClose,
+    required this.title,
+    required this.subtitle,
+    required this.playAgainLabel,
+    required this.closeLabel,
   });
 
   @override
@@ -19,32 +26,22 @@ class CompletionOverlay extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Flag icon
-            const Icon(
-              Icons.flag_sharp,
-              color: Colors.green,
-              size: 120,
-            ),
+            const Icon(Icons.flag_sharp, color: Colors.green, size: 120),
             const SizedBox(height: 30),
-            // Congratulations text
-            const Text(
-              'Congratulations!',
-              style: TextStyle(
+            Text(
+              title,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 15),
-            const Text(
-              'You reached the finish!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+            Text(
+              subtitle,
+              style: const TextStyle(color: Colors.white, fontSize: 24),
             ),
             const SizedBox(height: 40),
-            // Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -57,12 +54,9 @@ class CompletionOverlay extends StatelessWidget {
                       vertical: 15,
                     ),
                   ),
-                  child: const Text(
-                    'Play Again',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
+                  child: Text(
+                    playAgainLabel,
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -75,12 +69,9 @@ class CompletionOverlay extends StatelessWidget {
                       vertical: 15,
                     ),
                   ),
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
+                  child: Text(
+                    closeLabel,
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ],

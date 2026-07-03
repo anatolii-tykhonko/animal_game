@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Overlay widget for displaying win animation
 class WinOverlay extends StatelessWidget {
-  const WinOverlay({super.key});
+  final String message;
+
+  const WinOverlay({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class WinOverlay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'images/green-ok.png',
+              'assets/images/green-ok.png',
               width: 150,
               height: 150,
               fit: BoxFit.contain,
@@ -26,9 +27,9 @@ class WinOverlay extends StatelessWidget {
               },
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Correct!',
-              style: TextStyle(
+            Text(
+              message,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,

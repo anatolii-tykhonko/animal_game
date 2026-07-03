@@ -43,28 +43,37 @@ class LevelService {
   ];
   final Random _random = Random();
 
-  Level nextLevel(int previousLevelNumber, LevelMode? preferredMode) {
-    if (_availableAnimals.length < 3) {
-      throw Exception('Not enough animals available. Need at least 3.');
+  // Returns how many answer options to show for a given difficulty.
+  // difficulty 1 → 3, difficulty 2 → 4, difficulty 3+ → 6 (all animals).
+  int optionCountForDifficulty(int difficulty) {
+    if (difficulty <= 1) return 3;
+    if (difficulty == 2) return 4;
+    return min(6, _availableAnimals.length);
+  }
+
+  Level nextLevel(
+    int previousLevelNumber,
+    LevelMode? preferredMode, {
+    int difficulty = 1,
+  }) {
+    final optionCount = optionCountForDifficulty(difficulty);
+    if (_availableAnimals.length < optionCount) {
+      throw Exception('Not enough animals available. Need at least $optionCount.');
     }
 
-    // Determine mode based on level number or preference
-    final mode = preferredMode ?? 
+    final mode = preferredMode ??
         (previousLevelNumber < 5 ? LevelMode.picture : LevelMode.text);
 
-    // Select correct animal
     final correctAnimal = _availableAnimals[_random.nextInt(_availableAnimals.length)];
 
-    // Select two incorrect animals
     final incorrectAnimals = <Animal>[];
-    while (incorrectAnimals.length < 2) {
+    while (incorrectAnimals.length < optionCount - 1) {
       final candidate = _availableAnimals[_random.nextInt(_availableAnimals.length)];
       if (candidate.id != correctAnimal.id && !incorrectAnimals.contains(candidate)) {
         incorrectAnimals.add(candidate);
       }
     }
 
-    // Combine and shuffle options
     final options = [correctAnimal, ...incorrectAnimals]..shuffle(_random);
 
     return Level(

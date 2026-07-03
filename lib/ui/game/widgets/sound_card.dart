@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import '/services/audio_service.dart';
 
-/// Widget for displaying sound icon/button
-/// Plays audio from assets/audio/ folder when tapped
-/// Stops any currently playing audio and restarts it
 class SoundCard extends StatelessWidget {
-  /// Audio file path relative to assets/audio/ folder (e.g., "cow.wav", "dog.wav")
+  /// Audio file path relative to assets/audio/ folder (e.g., "cow.wav")
   final String audioPath;
-  
-  /// Optional AudioService instance. If not provided, creates a new one.
   final AudioService? audioService;
+  final String? imageAsset;
+  final String tapLabel;
 
   const SoundCard({
     super.key,
     required this.audioPath,
+    required this.tapLabel,
     this.audioService,
+    this.imageAsset,
   });
 
   @override
@@ -22,28 +21,48 @@ class SoundCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         final service = audioService ?? AudioService();
-        // Stop any currently playing audio
         await service.stop();
-        // Small delay to ensure stop completes, then play again
         await Future.delayed(const Duration(milliseconds: 100));
-        // Play the audio again
         await service.playAudio(audioPath);
-        // Dispose if we created a new service
         if (audioService == null) {
           service.dispose();
         }
       },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(
-          Icons.volume_up,
-          color: Colors.white,
-          size: 32,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (imageAsset != null)
+            Image.asset(
+              imageAsset!,
+              width: 120,
+              height: 120,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.pets, size: 120, color: Colors.grey),
+            ),
+          if (imageAsset != null) const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.volume_up,
+              color: Colors.white,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            tapLabel,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black54,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
