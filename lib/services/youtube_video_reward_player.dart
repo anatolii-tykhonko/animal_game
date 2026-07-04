@@ -80,7 +80,16 @@ class _YoutubeRewardWidgetState extends State<_YoutubeRewardWidget> {
   }
 
   void _onPlayerState(YoutubePlayerValue value) {
-    // Load playlist on first unStarted event (player WebView is ready)
+    // Auto-skip only on permanent, non-transient errors.
+    // html5Error (5) can be temporary on Android — do NOT skip for that.
+    if (!_finished &&
+        (value.error == YoutubeError.videoNotFound ||
+            value.error == YoutubeError.notEmbeddable)) {
+      _finish();
+      return;
+    }
+
+    // Load playlist on first unStarted event (WebView is ready)
     if (!_playlistLoaded &&
         value.playerState == PlayerState.unStarted &&
         widget.playlistId != null &&
@@ -121,15 +130,26 @@ class _YoutubeRewardWidgetState extends State<_YoutubeRewardWidget> {
   void dispose() {
     _timer?.cancel();
     _stateSub?.cancel();
-    _controller.close();
+    _stateSub = null;
+    // Delay close so in-flight WebView platform events can drain first.
+    // Immediate close triggers "Cannot add new events after calling close".
+    final ctrl = _controller;
+    Future<void>.delayed(
+      const Duration(milliseconds: 500),
+      ctrl.close,
+    );
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayerScaffold(
-      controller: _controller,
-      builder: (context, player) => player,
+    // Use YoutubePlayer (not Scaffold) so it respects parent constraints.
+    // AspectRatio gives the WebView a real size — without it YouTube shows "unavailable".
+    return Center(
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: YoutubePlayer(controller: _controller),
+      ),
     );
   }
 }

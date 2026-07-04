@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,17 @@ import 'ui/game/game_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  // youtube_player_iframe race condition: WebView sends events after controller.close().
+  // The package throws "Cannot add new events after calling close" — suppress it.
+  final prevOnError = PlatformDispatcher.instance.onError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (error is StateError &&
+        error.message == 'Cannot add new events after calling close') {
+      return true;
+    }
+    return prevOnError?.call(error, stack) ?? false;
+  };
   runApp(
     MultiProvider(
       providers: [

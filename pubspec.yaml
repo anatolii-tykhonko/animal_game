@@ -48,6 +48,8 @@ dependencies:
   shared_preferences: ^2.2.2
 
   # Video reward feature
+  webview_flutter: ^4.0.0
+  webview_flutter_android: ^3.0.0
   youtube_player_iframe: ^4.0.0
   connectivity_plus: ^6.0.0
 
