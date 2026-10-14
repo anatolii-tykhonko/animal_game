@@ -9,8 +9,8 @@ class SettingsService extends ChangeNotifier {
   static const _keyVideoId = 'settings_video_id';
   static const _keyPlaylistId = 'settings_playlist_id';
 
-  static const String defaultVideoId = '5Sj3lgwt_3I';
-  static const String defaultPlaylistId = 'PLdUropL5xSMjNyLvskAFn4AzT9WaxVRCf';
+  static const String defaultVideoId = '6ATbwi4kJ0w';
+  static const String defaultPlaylistId = '';
 
   bool videoRewardEnabled = true;
   int videoTimeLimitSeconds = 30;
