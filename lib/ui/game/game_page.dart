@@ -6,6 +6,8 @@ import '../../services/language_service.dart';
 import '../../services/level_service.dart';
 import '../../services/audio_service.dart';
 import '../../services/game_state_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import '../../services/settings_service.dart';
 import 'widgets/sound_card.dart';
 import 'widgets/animal_option_button.dart';
 import 'widgets/type_answer_field.dart';
@@ -13,6 +15,7 @@ import 'widgets/win_overlay.dart';
 import 'widgets/lose_overlay.dart';
 import 'widgets/dragon_progress.dart';
 import 'widgets/completion_overlay.dart';
+import 'video_reward_page.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -39,6 +42,7 @@ class _GamePageState extends State<GamePage> {
   bool _isGameCompleted = false;
   bool _stateLoaded = false;
   bool _showHint = false;
+  bool _showVideoReward = false;
 
   // Difficulty levels only apply to picture and text modes.
   bool get _hasDifficulty =>
@@ -184,8 +188,24 @@ class _GamePageState extends State<GamePage> {
     _saveGameState();
 
     if (_isGameCompleted) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _showWinOverlay = false);
+      Future.delayed(const Duration(seconds: 2), () async {
+        if (!mounted) return;
+        setState(() => _showWinOverlay = false);
+
+        final settings = context.read<SettingsService>();
+        if (settings.videoRewardEnabled) {
+          final results = await Connectivity().checkConnectivity();
+          if (!mounted) return;
+          if (results.any((r) => r != ConnectivityResult.none)) {
+            setState(() => _showVideoReward = true);
+            await Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => VideoRewardPage(settings: settings),
+            ));
+            if (!mounted) return;
+            setState(() => _showVideoReward = false);
+          }
+        }
+        // _isGameCompleted=true, _showVideoReward=false → CompletionOverlay shows
       });
     } else {
       Future.delayed(const Duration(seconds: 2), () {
@@ -217,6 +237,7 @@ class _GamePageState extends State<GamePage> {
       _showWinOverlay = false;
       _showLoseOverlay = false;
       _showHint = false;
+      _showVideoReward = false;
     });
     _loadNewLevel();
   }
@@ -232,6 +253,7 @@ class _GamePageState extends State<GamePage> {
       _showWinOverlay = false;
       _showLoseOverlay = false;
       _showHint = false;
+      _showVideoReward = false;
     });
     _loadNewLevel();
   }
@@ -424,7 +446,7 @@ class _GamePageState extends State<GamePage> {
             WinOverlay(message: s('correct')),
           if (_showLoseOverlay == true)
             LoseOverlay(message: s('tryAgain')),
-          if (_isGameCompleted)
+          if (_isGameCompleted && !_showVideoReward)
             CompletionOverlay(
               onRestart: _hasDifficulty ? _advanceDifficulty : _restartGame,
               onClose: () async {
